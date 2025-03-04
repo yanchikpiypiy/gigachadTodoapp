@@ -8,29 +8,29 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from app import celery_worker
 from celery.result import AsyncResult
+from uuid import UUID
 router = APIRouter(
     prefix='/todo',
     tags=['todo']
 )
 @router.post("",response_model=TodoDTO,description="Create new todo task")
 def create_todo(Todo: TodoDTO ,db: Session = Depends(get_db), user_dp: dict = Depends(auth.get_current_user)):
-    new_obj = models.Todo(**Todo.model_dump(), user_id=user_dp["id"])
+    
     # task = celery_worker.create_task.delay(1,4,6)
-    db.add(new_obj)
-    db.commit()
-    db.refresh(new_obj)
-
     to_email = "yanchervonyy@gmail.com"
-    subject = f"Todo Reminder: "
-    message_body = f"Reminder for your todo task: "
+    subject = f"Todo Reminder: Make sure to finish your todos today looser"
+    message_body = f"Reminder for your todo task: {Todo.short_desc}"
     
     # Schedule the task.
-    # The values a, b, and c are placeholders used in the task.
-    # 'a' here could represent a delay before the task starts.
-    celery_worker.create_task.apply_async(
+    task = celery_worker.create_task.apply_async(
         args=[1, 4, 6, to_email, subject, message_body],
         eta=Todo.reminder_time  # Schedules the task to run at reminder_time.
     )
+
+    new_obj = models.Todo(**Todo.model_dump(), user_id=user_dp["id"], task_id=task.id)
+    db.add(new_obj)
+    db.commit()
+    db.refresh(new_obj)
     return new_obj
 
 @router.get("/todos", description="Get list of todos")
@@ -60,3 +60,8 @@ def task_status(task_id: str):
         return result.get()
     else:
         return "Task failed"
+    
+@router.delete("/tasks/{task_id}", description="Delete a scheduled task")
+def  delete_task(task_id: str):
+    celery_worker.celery.control.revoke(task_id, terminate=True)
+    return {"message": "Task revoked successfully", "task_id": task_id}

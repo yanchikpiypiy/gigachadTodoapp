@@ -25,7 +25,7 @@ def create_task(a, b, c, to_email, subject, message_body="DO YOUR FUCKING TODO")
 
     # Connect to the SMTP server and send the email.
     with smtplib.SMTP(os.environ.get("SMTP_SERVER"), int(os.environ.get("SMTP_PORT"))) as server:
-        server.starttls()  # Secure the connection
+        server.starttls()
         server.login(os.environ.get("EMAIL_USERNAME"), os.environ.get("EMAIL_PASSWORD"))
         server.send_message(msg)
     

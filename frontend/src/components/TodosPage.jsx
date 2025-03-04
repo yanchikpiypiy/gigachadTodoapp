@@ -125,7 +125,7 @@ function TodosPage() {
           todos.map((todo) => (
             <TodoContainer
               key={todo.id}
-              id={todo.id}
+              todo={todo}
               handleDelete={handleDelete}
               shortDesc={todo.short_desc}
             />
