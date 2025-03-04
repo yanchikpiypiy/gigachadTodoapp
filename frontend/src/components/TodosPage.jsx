@@ -4,19 +4,20 @@ import TodoContainer from "./TodoContainer";
 function TodosPage() {
   const [added, setAdded] = useState(2);
   const [todos, setTodos] = useState([]);
-  const [token, setToken] = useState(null); // Manage token in state
+  const [token, setToken] = useState(null);
   const shortDesc = useRef();
+  const reminderTime = useRef(); // New ref for reminder time
   const API_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
+
   // Fetch the token from localStorage on component mount
   useEffect(() => {
     const storedToken = localStorage.getItem("jwtToken");
-    console.log(storedToken)
     if (storedToken) {
-      setToken(storedToken); // Set token in state
+      setToken(storedToken);
     }
   }, []);
 
-  // Add a new todo
+  // Add a new todo along with a reminder time
   async function handleAdd() {
     if (!token) {
       console.error("No token found, user is not authenticated.");
@@ -24,13 +25,17 @@ function TodosPage() {
     }
 
     try {
-      const response = await fetch(`${API_URL}`, {
+      const response = await fetch(`${API_URL}/todo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
         },
-        body: JSON.stringify({ short_desc: shortDesc.current.value }),
+        // Pass both the task description and the reminder time in the payload
+        body: JSON.stringify({ 
+          short_desc: shortDesc.current.value,
+          reminder_time: reminderTime.current.value  // Expecting ISO formatted datetime string
+        }),
       });
 
       if (!response.ok) throw new Error("Failed to add todo");
@@ -38,6 +43,7 @@ function TodosPage() {
       await response.json();
       setAdded(prev => prev + 1);
       shortDesc.current.value = "";
+      reminderTime.current.value = "";
     } catch (error) {
       console.error("Error adding todo:", error);
     }
@@ -66,13 +72,13 @@ function TodosPage() {
     }
   }
 
-  // Fetch todos when added changes
+  // Fetch todos when 'added' changes
   useEffect(() => {
-    if (!token) return; // Do not make API request if token is missing
+    if (!token) return;
 
     async function fetchTodos() {
       try {
-        const response = await fetch(`${API_URL}/todos`, {
+        const response = await fetch(`${API_URL}/todo/todos`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
@@ -92,12 +98,18 @@ function TodosPage() {
   return (
     <>
       {/* Todo input section */}
-      <div className="w-full h-16 flex justify-center items-center mt-8 px-4">
+      <div className="w-full flex flex-col justify-center items-center mt-8 px-4 gap-2">
         <input
           type="text"
           placeholder="Enter a task..."
           ref={shortDesc}
           className="w-1/3 h-10 px-4 border-2 border-gray-600 bg-gray-800 text-white rounded-md focus:outline-none focus:border-blue-400"
+        />
+        <input
+          type="datetime-local"
+          ref={reminderTime}
+          className="w-1/3 h-10 px-4 border-2 border-gray-600 bg-gray-800 text-white rounded-md focus:outline-none focus:border-blue-400"
+          placeholder="Set reminder time"
         />
         <button
           onClick={handleAdd}

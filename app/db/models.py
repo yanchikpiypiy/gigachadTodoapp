@@ -2,6 +2,7 @@ from sqlalchemy.orm import declarative_base, mapped_column, Mapped, relationship
 from sqlalchemy import Column, DateTime, String, Integer, Boolean, ForeignKey
 from datetime import datetime
 from app.db.connection import engine
+from typing import Optional
 
 Base = declarative_base()
 
@@ -25,7 +26,7 @@ class Todo(Base,TimeStampsMixins):
     short_desc: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     user: Mapped[Users] = relationship("Users", back_populates="todos")
-
+    reminder_time: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 class Startup():
     def startup():
         engine.echo = False

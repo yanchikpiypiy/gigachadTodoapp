@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Response
 from sqlalchemy.orm import Session
 from app.db import models
 from app.schemas.Users import UsersDTO,Token
-from app.db.connection import get_db
+from app.db.connection import get_db, SessionLocal
 from app.core.config import settings
 from typing import Annotated
 router = APIRouter(
@@ -19,6 +19,13 @@ ALGORITHM = 'HS256'
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 auth_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
+def populate_db():
+    with SessionLocal() as session:
+        password = bcrypt_context.hash("admin")
+        new_obj = models.Users(email="yanchik@gmail.com", username="admin", password=password)
+        session.add(new_obj)
+        session.commit()
+        session.refresh(new_obj)  
 def authanticate_user(username:str, password:str,db):
         user = db.query(models.Users).filter(models.Users.username == username).first()
         if not user:

@@ -10,8 +10,11 @@ class Settings(BaseSettings):
     DB_NAME: str
     SECRET_KEY: str
     DATABASE_URL: str
+    CELERY_RESULT_BACKEND: str
+    CELERY_BROKER_URL: str
     class Config:
         env_file = ".env"
+        extra = "ignore"
     
     @property
     def DATABASE_URL_psycopg(self):
