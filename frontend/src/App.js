@@ -8,7 +8,7 @@ function App() {
   // User state holds authentication info (token and username)
   const [user, setUser] = useState(null);
   const [cred, setCred] = useState(null);
-
+  
   // Check localStorage for an existing token on app load
   useEffect(() => {
     const storedToken = localStorage.getItem("jwtToken");

@@ -2,10 +2,10 @@ import sys, uvicorn
 import os
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from fastapi import FastAPI, Depends
-from db.connection import get_db
+from app.db.connection import get_db
 from sqlalchemy.orm import Session
-from db import models
-from db.connection import settings
+from app.db import models
+from app.db.connection import settings
 from app.schemas.Todo import TodoDTO
 from app.db.models import Startup
 from app.routers import auth
@@ -14,9 +14,12 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 app.include_router(auth.router)
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000",
+    "http://frontend:3000",    
+    "http://web:8000"         
 ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -49,6 +52,6 @@ def remove_todo(todo_id: int,db:Session = Depends(get_db)):
 
 if __name__ == "__main__":
     if "--webserver" in sys.argv:
-        uvicorn.run("app.main:app", reload=True)
+        uvicorn.run("app.main:app", reload=True, host="0.0.0.0", port=8000)
 
 

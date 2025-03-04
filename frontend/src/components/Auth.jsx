@@ -11,7 +11,7 @@ function Auth({ onAuthSuccess }) {
 
   const inputClass =
     "w-full h-10 px-4 border-2 border-gray-600 bg-gray-800 text-white rounded-md focus:outline-none focus:border-blue-400";
-
+  const API_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
   // On mount, check if a token exists in localStorage.
   useEffect(() => {
     const storedToken = localStorage.getItem("jwtToken");
@@ -30,7 +30,7 @@ function Auth({ onAuthSuccess }) {
     params.append("password", password);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/token", {
+      const response = await fetch(`${API_URL}/auth/token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -56,7 +56,7 @@ function Auth({ onAuthSuccess }) {
     params.append("password", password);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/token", {
+      const response = await fetch(`${API_URL}/auth/token`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -90,7 +90,7 @@ function Auth({ onAuthSuccess }) {
     const payload = { username, password, email };
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/", {
+      const response = await fetch(`${API_URL}/auth/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

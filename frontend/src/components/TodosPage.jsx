@@ -6,7 +6,7 @@ function TodosPage() {
   const [todos, setTodos] = useState([]);
   const [token, setToken] = useState(null); // Manage token in state
   const shortDesc = useRef();
-
+  const API_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000";
   // Fetch the token from localStorage on component mount
   useEffect(() => {
     const storedToken = localStorage.getItem("jwtToken");
@@ -24,7 +24,7 @@ function TodosPage() {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/", {
+      const response = await fetch(`${API_URL}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +51,7 @@ function TodosPage() {
     }
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/todo/${id}`, {
+      const response = await fetch(`${API_URL}/todo/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -72,7 +72,7 @@ function TodosPage() {
 
     async function fetchTodos() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/todos", {
+        const response = await fetch(`${API_URL}/todos`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
