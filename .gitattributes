@@ -1,10 +1,8 @@
 *.py linguist-language=Python
 app/* linguist-language=Python
 frontend/* linguist-language=JavaScript
-*.js linguist-language=JavaScript
-*.jsx linguist-language=JavaScript
-*.tsx linguist-language=JavaScript
-*.ts linguist-language=JavaScript
+*.js linguist-detectable=false
+*.jsx linguist-detectable=false
 *.html linguist-detectable=true
 *.css linguist-detectable=true
 *.json linguist-detectable=true
